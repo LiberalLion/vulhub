@@ -13,7 +13,7 @@ def index():
     except:
         username = "Guest"
 
-    return "Hello %s" % username
+    return f"Hello {username}"
 
 if __name__ == "__main__":
     app.run()

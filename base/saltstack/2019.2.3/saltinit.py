@@ -45,11 +45,20 @@ async def main():
                 json.dump(json.loads(os.environ['SALT_MASTER_CONFIG']), masterfile)
         with open('/etc/salt/master.d/user.conf', 'w') as userfile:
             json.dump({'user': 'root'}, userfile)
-        futures.append(await asyncio.create_subprocess_exec('salt-api'))
-        futures.append(await asyncio.create_subprocess_exec('salt-master'))
-    
-    futures.append(await asyncio.create_subprocess_exec("/usr/sbin/sshd", "-D"))
-    futures.append(await asyncio.create_subprocess_exec("/usr/sbin/cron", "-f", "-L", "15"))
+        futures.extend(
+            (
+                await asyncio.create_subprocess_exec('salt-api'),
+                await asyncio.create_subprocess_exec('salt-master'),
+            )
+        )
+    futures.extend(
+        (
+            await asyncio.create_subprocess_exec("/usr/sbin/sshd", "-D"),
+            await asyncio.create_subprocess_exec(
+                "/usr/sbin/cron", "-f", "-L", "15"
+            ),
+        )
+    )
     await asyncio.gather(*[future.communicate() for future in futures])
 
 

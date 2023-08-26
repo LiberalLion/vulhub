@@ -43,11 +43,11 @@ hb = h2bin('''
 
 def hexdump(s: bytes):
     for b in range(0, len(s), 16):
-        lin = [c for c in s[b : b + 16]]
+        lin = list(s[b : b + 16])
         hxdat = ' '.join('%02X' % c for c in lin)
         pdat = ''.join((chr(c) if 32 <= c <= 126 else '.' )for c in lin)
         print('  %04x: %-48s %s' % (b, hxdat, pdat))
-    
+
     print("")
 
 def recvall(s, length, timeout=5):
@@ -122,7 +122,7 @@ def main():
     sys.stdout.flush()
     while True:
         typ, ver, pay = recvmsg(s)
-        if typ == None:
+        if typ is None:
             print('Server closed connection without sending Server Hello.')
             return
         # Look for server hello done message.
